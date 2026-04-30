@@ -6,8 +6,8 @@ import logging
 from datetime import datetime, timedelta, timezone
 
 import requests
-import pandas as pd # Import pandas for DataFrame operations
-from snowflake.connector.pandas_tools import write_pandas
+#import pandas as pd # Import pandas for DataFrame operations
+#from snowflake.connector.pandas_tools import write_pandas
 
 from airflow.sdk import dag, task
 
@@ -18,10 +18,10 @@ from utils import get_snowflake_connection
 # -------------------------------------------------------------------
 # Configuration
 # -------------------------------------------------------------------
-ON_OFF_SNOWFLAKE_LOAD_ENABLED = False  # Set to True to enable Snowflake loading
+ON_OFF_SNOWFLAKE_LOAD_ENABLED = True  # Set to True to enable Snowflake loading
 SNOWFLAKE_DATABASE = os.getenv("SNOWFLAKE_DATABASE", "SNOWBEARAIR_DB") # Default to SNOWBEARAIR_DB
 SNOWFLAKE_SCHEMA = os.getenv("SNOWFLAKE_SCHEMA", "RAW") # Default to RAW
-SNOWFLAKE_TABLE = "BORED_API_ACTIVITIES" # Table name for Bored API data
+SNOWFLAKE_TABLE = "STARTER_DAG_BRUNT_R" # Table name for Bored API data
 
 @dag(
     dag_id="starter_dag",
@@ -75,6 +75,7 @@ def starter_dag_elt():
 
     @task
     def transform_data(file_path: str):
+        import pandas as pd
         """
         Reads the staged file, transforms the data.
         """
@@ -116,7 +117,8 @@ def starter_dag_elt():
         return df
 
     @task
-    def load_transformed_data_to_snowflake(df: pd.DataFrame):
+    def load_transformed_data_to_snowflake(df):
+        from snowflake.connector.pandas_tools import write_pandas
         """
         Loads the transformed DataFrame into Snowflake.
         """
